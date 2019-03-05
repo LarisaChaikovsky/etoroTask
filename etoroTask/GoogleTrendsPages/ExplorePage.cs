@@ -93,7 +93,7 @@ namespace etoroTask.GoogleTrendsPages
 
         public bool CheckRelatedQueries()
         {
-            log.Info("Cheching if 'Related Queries' appears for choosen district");
+            log.Info("Checking if 'Related Queries' appears for choosen district");
             NgWebElement relatedQueriesElement = driver.FindElement(By.Id("RELATED_QUERIES"));
 
             return true;
