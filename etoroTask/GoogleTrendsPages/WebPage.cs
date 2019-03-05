@@ -1,18 +1,20 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using Protractor;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace etoroTask.GoogleTrendsPages
 {
     class WebPage
     {
-        protected readonly IWebDriver driver;
+        protected static readonly log4net.ILog log = log4net.LogManager.GetLogger
+(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+        protected readonly NgWebDriver driver;
         protected readonly WebDriverWait wait;
 
-        protected WebPage(IWebDriver driver, WebDriverWait wait)
+        protected WebPage(NgWebDriver driver, WebDriverWait wait)
         {
             this.driver = driver;
             this.wait = wait;
@@ -33,7 +35,7 @@ namespace etoroTask.GoogleTrendsPages
                     }
                     elementDisplayed = driver.FindElement(selector).Displayed;
                 }
-                catch(Exception)
+                catch(Exception e)
                 {
                     Thread.Sleep(timeoutInSeconds);
                     return false;

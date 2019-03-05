@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using NUnit.Framework;
 using etoroTask.GoogleTrendsPages;
 using OpenQA.Selenium.Support.UI;
 using FluentAssertions;
-using log4net;
 using OpenQA.Selenium.Firefox;
+using Protractor;
 
 [assembly: log4net.Config.XmlConfigurator(ConfigFile = "log4net.config", Watch = true)]
 
@@ -20,6 +18,7 @@ namespace etoroTask
     {
         IWebDriver driver;
         WebDriverWait wait;
+        NgWebDriver ngDriver;
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger
 (System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -29,7 +28,9 @@ namespace etoroTask
         {
             log.Info("Initializing Chrome WebDriver");
             driver = new ChromeDriver();
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(50));
+            ngDriver = new NgWebDriver(driver);
+            ngDriver.Manage().Window.Maximize();
+            wait = new WebDriverWait(ngDriver, TimeSpan.FromSeconds(50));
         }
 
         [Test]
@@ -39,32 +40,27 @@ namespace etoroTask
             try
             {
                 driver.Navigate().GoToUrl("https://trends.google.com");
-                driver.Manage().Window.Maximize();
-                HomePage trendsHomePage = new HomePage(driver, wait);
-                log.Info("Searching 'Selenium' on 'https://trends.google.com' Home page");
+
+                HomePage trendsHomePage = new HomePage(ngDriver, wait);                
                 trendsHomePage.SearchText("Selenium");
-                ExplorePage explorePage = new ExplorePage(driver, wait);
-                log.Info("Selecting 'Israel' on Explore page");
+
+                ExplorePage explorePage = new ExplorePage(ngDriver, wait);
                 explorePage.SelectCountry("Israel");
-                log.Info("Selecting Subregions List View");
                 explorePage.SelectSubregionsListView();
-                log.Info("Cheching if 'Tel Aviv District' exists in the Subregions list");
                 explorePage.SelectSubregion("Tel Aviv District").Should().BeTrue();
-                log.Info("Cheching if 'Related Queries' appears for choosen district");
                 explorePage.CheckRelatedQueries().Should().BeTrue();
             }
             catch (NoSuchElementException e)
             {
                 log.Error(e);
-                driver.Close();
+                driver.Quit();
             }
-
         }
 
         [OneTimeTearDown]
         public void EndTest()
         {
-            driver.Close();
+            driver.Quit();
         }
 
     }
@@ -74,6 +70,7 @@ namespace etoroTask
     class GoogleTrendsTestFireFox
     {
         IWebDriver driver;
+        NgWebDriver ngDriver;
         WebDriverWait wait;
 
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger
@@ -84,7 +81,9 @@ namespace etoroTask
         {
             log.Info("Initializing FireFox WebDriver");
             driver = new FirefoxDriver();
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(50));
+            ngDriver = new NgWebDriver(driver);
+            ngDriver.Manage().Window.Maximize();
+            wait = new WebDriverWait(ngDriver, TimeSpan.FromSeconds(50));
         }
 
         [Test]
@@ -94,31 +93,26 @@ namespace etoroTask
             try
             {
                 driver.Navigate().GoToUrl("https://trends.google.com");
-                driver.Manage().Window.Maximize();
-                HomePage trendsHomePage = new HomePage(driver, wait);
-                log.Info("Searching 'Selenium' on 'https://trends.google.com' Home page");
+                HomePage trendsHomePage = new HomePage(ngDriver, wait);
                 trendsHomePage.SearchText("Selenium");
-                ExplorePage explorePage = new ExplorePage(driver, wait);
-                log.Info("Selecting 'Israel' on Explore page");
+
+                ExplorePage explorePage = new ExplorePage(ngDriver, wait);
                 explorePage.SelectCountry("Israel");
-                log.Info("Selecting Subregions List View");
                 explorePage.SelectSubregionsListView();
-                log.Info("Cheching if 'Tel Aviv District' exists in the Subregions list");
                 explorePage.SelectSubregion("Tel Aviv District").Should().BeTrue();
-                log.Info("Cheching if 'Related Queries' appears for choosen district");
                 explorePage.CheckRelatedQueries().Should().BeTrue();
             }
             catch (NoSuchElementException e)
             {
                 log.Error(e);
-                driver.Close();
+                driver.Quit();
             }          
         }
 
         [OneTimeTearDown]
         public void EndTest()
         {
-            driver.Close();
+            driver.Quit();
         }
 
     }
